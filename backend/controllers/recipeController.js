@@ -19,7 +19,7 @@ exports.searchRecipe = async (req, res) => {
       return res.json({
         type: 'recipe',
         source: 'database',
-        data: existingRecipe
+        ...existingRecipe.toObject()
       });
     }
 
@@ -29,17 +29,42 @@ exports.searchRecipe = async (req, res) => {
     // Save recipe to database if it's a full recipe
     if (aiResult.type === 'recipe') {
       const newRecipe = new Recipe({
-        ...aiResult,
+        name: aiResult.name,
+        cuisine: aiResult.cuisine,
+        category: aiResult.category || 'other',
+        difficulty: aiResult.difficulty || 'Medium',
+        prepTime: aiResult.prepTime,
+        cookTime: aiResult.cookTime,
+        servings: aiResult.servings,
+        ingredients: aiResult.ingredients || [],
+        instructions: aiResult.instructions || [],
+        tips: aiResult.tips || [],
         createdBy: req.user?._id,
         isAIGenerated: true
       });
       await newRecipe.save();
-      aiResult._id = newRecipe._id;
+      
+      return res.json({
+        type: 'recipe',
+        source: 'ai',
+        _id: newRecipe._id,
+        name: newRecipe.name,
+        cuisine: newRecipe.cuisine,
+        category: newRecipe.category,
+        difficulty: newRecipe.difficulty,
+        prepTime: newRecipe.prepTime,
+        cookTime: newRecipe.cookTime,
+        servings: newRecipe.servings,
+        ingredients: newRecipe.ingredients,
+        instructions: newRecipe.instructions,
+        tips: newRecipe.tips
+      });
     }
 
+    // If it's a category result, return as is
     res.json({
-      ...aiResult,
-      source: 'ai'
+      source: 'ai',
+      ...aiResult
     });
   } catch (error) {
     console.error('Search recipe error:', error);
