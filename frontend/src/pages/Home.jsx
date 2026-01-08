@@ -65,7 +65,7 @@ export default function Home() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <ChefHat className="w-8 h-8 text-orange-500" />
-              <h1 className="text-2xl font-bold text-gray-800">AI Recipe Book</h1>
+              <h1 className="text-2xl font-bold text-gray-800">Dish Dash</h1>
             </div>
             {user && (
               <div className="flex items-center gap-4">
